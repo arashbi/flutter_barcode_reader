@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 void main() {
-  runApp(new MyApp());
+  runApp(new MaterialApp(
+    home: new MyApp(),
+  ) );
 }
 
 class MyApp extends StatefulWidget {
@@ -23,8 +25,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      home: new Scaffold(
+    return new Scaffold(
           appBar: new AppBar(
             title: new Text('Barcode Scanner Example'),
           ),
@@ -36,16 +37,20 @@ class _MyAppState extends State<MyApp> {
                       onPressed: scan, child: new Text("Scan")),
                   padding: const EdgeInsets.all(8.0),
                 ),
-                new Text(barcode),
               ],
             ),
-          )),
-    );
+          ));
   }
 
   Future scan() async {
     try {
       String barcode = await BarcodeScanner.scan();
+      print("${context}");
+      Navigator.push(context, MaterialPageRoute(
+          builder: (context) {
+            new BarcodePage(barcode);}
+          ));
+
       setState(() => this.barcode = barcode);
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
@@ -61,4 +66,33 @@ class _MyAppState extends State<MyApp> {
       setState(() => this.barcode = 'Unknown error: $e');
     }
   }
+}
+
+class BarcodePage extends StatefulWidget {
+  BarcodePage(String s) {
+    str = s;
+  }
+  String str;
+  @override
+  State<StatefulWidget> createState() {
+    return _BarcodePageState(str);
+  }
+
+}
+class _BarcodePageState extends State<BarcodePage> {
+    String str;
+
+  _BarcodePageState(String s ){
+    str = s;
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar:  new AppBar(title: new Text("Bar code"),),
+      body: new Text(str),
+    );
+  }
+
 }
